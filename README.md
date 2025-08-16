@@ -28,8 +28,10 @@ A simple Python script to benchmark your system's memory performance. Perfect fo
    ```
 3. **Install dependencies:**
    ```bash
-   pip install numpy psutil
+   pip install -r requirements.txt
    ```
+
+The `requirements.txt` file now contains the exact package versions used in this project. This ensures reproducibility and compatibility when setting up your environment.
 
 ## 🏃 Usage
 Run the benchmark script:
