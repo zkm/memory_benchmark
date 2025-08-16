@@ -13,7 +13,6 @@ RESULTS_FILE = "memory_benchmark_results.txt"
 CSV_FILE = "memory_benchmark_results.csv"
 
 
-
 def memory_read_write_test(size_mb=1024):
 	print(Fore.CYAN + f"🧠 Allocating {size_mb}MB array...")
 	arr = np.random.rand(size_mb * 1024 * 1024 // 8)  # float64 = 8 bytes
@@ -30,7 +29,6 @@ def memory_read_write_test(size_mb=1024):
 	print(Fore.GREEN + f"🟢 Read time: {read_time:.3f}s")
 
 	return write_time, read_time
-
 
 
 def log_results(write_time, read_time, size_mb):
@@ -56,7 +54,6 @@ def log_results(write_time, read_time, size_mb):
 			writer.writerow([
 				"Test Size (MB)", "Write Time (s)", "Read Time (s)", "RAM Total (GB)", "RAM Available (GB)", "Timestamp", "CPU", "Machine", "OS"
 			])
-		# Split long line for E501
 		writer.writerow([
 			size_mb,
 			f"{write_time:.3f}",
@@ -68,7 +65,6 @@ def log_results(write_time, read_time, size_mb):
 			platform.machine(),
 			f"{platform.system()} {platform.release()}"
 		])
-
 
 
 def main():
@@ -100,7 +96,6 @@ def main():
 		print(f"{str(size_mb // 1024)+'GB':<8}{write_time:<15.3f}{read_time:<15.3f}{total_ram:<12.2f}{avail_ram:<12.2f} 📝")
 		log_results(write_time, read_time, size_mb)
 	print(Fore.MAGENTA + Style.BRIGHT + f"\n✅ Results logged to {RESULTS_FILE} and {CSV_FILE}\n")
-
 
 
 if __name__ == "__main__":
