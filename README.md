@@ -49,8 +49,8 @@ test_sizes = [1024, 2048, 4096, 8192]  # 1GB, 2GB, 4GB, 8GB
 ## 📊 Interpreting Results
 Compare read/write times before and after your RAM upgrade. Lower times indicate better memory bandwidth. For best results, run with large test sizes (e.g., 8GB or more).
 
-## �️ System Information Logging
+## 🖥️ System Information Logging
 The script logs system architecture, OS, and kernel info for each benchmark run. CPU info is displayed and logged only if available (Linux systems may show this as blank).
 
-## �📝 License
+## 📝 License
 [MIT](LICENSE)
