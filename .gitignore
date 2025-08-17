@@ -210,5 +210,5 @@ marimo/_lsp/
 __marimo__/
 
 # Benchmark results
-memory_benchmark_results.txt
-memory_benchmark_results.csv
+memory_benchmark_*.txt
+memory_benchmark_*.csv
