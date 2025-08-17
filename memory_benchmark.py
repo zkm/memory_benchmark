@@ -17,15 +17,15 @@ def memory_read_write_test(size_mb=1024):
     print(Fore.CYAN + f"🧠 Allocating {size_mb}MB array...")
     arr = np.random.rand(size_mb * 1024 * 1024 // 8)  # float64 = 8 bytes
     print(Fore.YELLOW + "🟡 Starting write test...")
-    start = time.time()
+    start = time.perf_counter()
     arr[:] = 1.2345
-    write_time = time.time() - start
+    write_time = time.perf_counter() - start
     print(Fore.GREEN + f"🟢 Write time: {write_time:.3f}s")
 
     print(Fore.YELLOW + "🟡 Starting read test...")
-    start = time.time()
+    start = time.perf_counter()
     _ = arr.sum()
-    read_time = time.time() - start
+    read_time = time.perf_counter() - start
     print(Fore.GREEN + f"🟢 Read time: {read_time:.3f}s")
 
     return write_time, read_time
