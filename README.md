@@ -1,10 +1,6 @@
-
 # 🧠 Memory Benchmark
 
-A powerful Python script to benchmark your system's memory performance with enterprise-g```
-
-## 📈 Interpreting Results
-- **Lower times = better performance**: Faster memory read/write speeds features. Perfect for comparing RAM configurations before and after hardware upgrades, CI/CD pipelines, and performance monitoring.
+A powerful Python script to benchmark your system's memory performance with enterprise-grade features. Perfect for comparing RAM configurations before and after hardware upgrades, CI/CD pipelines, and performance monitoring.
 
 ---
 
@@ -94,19 +90,37 @@ python memory_benchmark.py --quiet --csv-only --runs 3 --sizes 2048 4096 8192
 
 ### Performance Monitoring
 ```bash
-# Weekly automated benchmark
-python memory_benchmark.py --quiet --csv-only --runs 3 >> weekly_report.log
+# Daily automated benchmark (logs to CSV for analysis)
+python memory_benchmark.py --quiet --csv-only --runs 3
+
+# Monitor system over time
+crontab -e
+```
+
+Add this line to your crontab:
+
+```bash
+0 2 * * * cd /path/to/memory_benchmark && python memory_benchmark.py --quiet --csv-only --runs 3
 ```
 
 ### Hardware Comparison
 ```bash
-# Before upgrade
+# Before upgrade - save baseline
 python memory_benchmark.py --runs 5 --csv-only
+cp memory_benchmark_results.csv baseline_results.csv
 
-# After upgrade
+# After upgrade - compare results
 python memory_benchmark.py --runs 5 --csv-only
+# Compare the two CSV files using your preferred tool (Excel, pandas, etc.)
+```
 
-# Compare CSV files
+### Stress Testing
+```bash
+# Test system limits (be careful with large sizes)
+python memory_benchmark.py --sizes 1024 2048 4096 8192 16384 --runs 3 --quiet
+
+# Quick system check
+python memory_benchmark.py --sizes 512 1024 --runs 2 --quiet --csv-only
 ```
 
 ### CI/CD Integration
@@ -115,7 +129,7 @@ python memory_benchmark.py --runs 5 --csv-only
 python memory_benchmark.py --quiet --sizes 1024 2048 --runs 2
 ```
 
-## � Interpreting Results
+## 📈 Interpreting Results
 - **Lower times = better performance**: Faster memory read/write speeds
 - **Multiple runs**: Use `--runs 3` or higher for consistent results
 - **Test size considerations**:
