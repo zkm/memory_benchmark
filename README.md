@@ -1,7 +1,10 @@
 
 # 🧠 Memory Benchmark
 
-A powerful Python script to benchmark your system's memory performance with enterprise-grade features. Perfect for comparing RAM configurations before and after hardware upgrades, CI/CD pipelines, and performance monitoring.
+A powerful Python script to benchmark your system's memory performance with enterprise-g```
+
+## 📈 Interpreting Results
+- **Lower times = better performance**: Faster memory read/write speeds features. Perfect for comparing RAM configurations before and after hardware upgrades, CI/CD pipelines, and performance monitoring.
 
 ---
 
