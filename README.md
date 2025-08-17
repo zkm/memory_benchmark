@@ -4,6 +4,29 @@ A powerful Python script to benchmark your system's memory performance with ente
 
 ---
 
+## Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+   - [Basic Usage](#basic-usage)
+   - [Advanced Options](#advanced-options)
+   - [Command Line Options](#command-line-options)
+- [Output Files](#output-files)
+   - [CSV Columns](#csv-columns)
+- [Advanced Usage Examples](#advanced-usage-examples)
+   - [Performance Monitoring](#performance-monitoring)
+   - [Hardware Comparison](#hardware-comparison)
+   - [Stress Testing](#stress-testing)
+   - [CI/CD Integration](#cicd-integration)
+- [Interpreting Results](#interpreting-results)
+- [Development](#development)
+   - [VS Code Configuration](#vs-code-configuration)
+   - [Testing](#testing)
+- [System Compatibility](#system-compatibility)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## 🚀 Features
 - **Accurate Memory Testing**: Uses `time.perf_counter()` for high-precision timing and `np.empty()` for unbiased allocation
 - **Real Memory Bandwidth**: Tests actual memory access patterns, not optimized NumPy operations
@@ -17,15 +40,19 @@ A powerful Python script to benchmark your system's memory performance with ente
 
 ## 📦 Requirements
 - Python 3.7 or newer
-- numpy >= 1.26.4
+- NumPy >= 1.26.4
 - psutil
 - colorama
 
 ## ⚡️ Quick Start
 1. **Clone the repository:**
    ```bash
-   git clone git@github.com:zkm/memory_benchmark.git
+   # HTTPS (recommended if you don't have SSH keys set up)
+   git clone https://github.com/zkm/memory_benchmark.git
    cd memory_benchmark
+
+   # or via SSH
+   # git clone git@github.com:zkm/memory_benchmark.git
    ```
 2. **(Recommended) Create and activate a virtual environment:**
    ```bash
@@ -102,6 +129,8 @@ Add this line to your crontab:
 ```bash
 0 2 * * * cd /path/to/memory_benchmark && python memory_benchmark.py --quiet --csv-only --runs 3
 ```
+
+Tip: Use absolute paths to both the repository and your Python interpreter when running from cron.
 
 ### Hardware Comparison
 ```bash
