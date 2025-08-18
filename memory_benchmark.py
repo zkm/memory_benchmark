@@ -2,10 +2,12 @@ import argparse
 import csv
 import os
 import platform
-import subprocess  # ✅ moved to top so exception handling always works
+import subprocess
 import time
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import psutil
 from colorama import Fore, Style, init
 
@@ -16,12 +18,22 @@ CSV_FILE = "memory_benchmark_results.csv"
 
 
 def format_size(size_mb: int) -> str:
-    """Return human-readable size string (MB or GB)."""
-    return f"{size_mb}MB" if size_mb < 1024 else f"{size_mb // 1024}GB"
+    """
+    Convert a size in megabytes to a human-friendly string.
+    Shows MB for sizes < 1024, otherwise shows GB.
+    """
+    if size_mb < 1024:
+        return f"{size_mb} MB"
+    else:
+        gb = size_mb / 1024
+        return f"{gb:.1f} GB"
 
 
 def get_cpu_info():
-    """Get CPU information in a portable way across different operating systems."""
+    """
+    Try to get a user-friendly CPU name for the current system.
+    Falls back to architecture if not available.
+    """
     cpu_info = platform.processor()
     if cpu_info:
         return cpu_info
@@ -46,32 +58,39 @@ def get_cpu_info():
             lines = result.stdout.strip().split('\n')
             if len(lines) > 1:
                 return lines[1].strip()
-    except (FileNotFoundError, subprocess.SubprocessError, IndexError):
+    except Exception:
         pass
 
     return f"{platform.machine()} processor"
 
 
 def memory_read_write_test(size_mb=1024, quiet=False):
-    msg = f"Allocating {format_size(size_mb)} array..."
+    """
+    Allocate a large array and measure how fast we can write to and read from it.
+    Returns write and read times in seconds.
+    """
+    msg = f"Allocating an array of {format_size(size_mb)}..."
     print(msg if quiet else Fore.CYAN + f"🧠 {msg}")
 
     try:
         arr = np.empty(size_mb * 1024 * 1024 // 8, dtype=np.float64)
     except MemoryError:
-        msg = f"Failed to allocate {format_size(size_mb)} - insufficient memory"
+        msg = f"Could not allocate {format_size(size_mb)} (not enough memory)"
         print(msg if quiet else Fore.RED + f"❌ {msg}")
         return None, None
 
     # Write benchmark
-    print("Starting write test..." if quiet else Fore.YELLOW + "🟡 Starting write test...")
+    print("Measuring write speed..." if quiet else Fore.YELLOW + "🟡 Measuring write speed...")
     start = time.perf_counter()
     arr[:] = 1.2345
     write_time = time.perf_counter() - start
-    print(f"Write time: {write_time:.3f}s" if quiet else Fore.GREEN + f"🟢 Write time: {write_time:.3f}s")
+    print(
+        f"Write completed in {write_time:.3f} seconds"
+        if quiet else Fore.GREEN + f"🟢 Write completed in {write_time:.3f} seconds"
+    )
 
     # Read benchmark
-    print("Starting read test..." if quiet else Fore.YELLOW + "🟡 Starting read test...")
+    print("Measuring read speed..." if quiet else Fore.YELLOW + "🟡 Measuring read speed...")
     start = time.perf_counter()
     total = 0.0
     target_samples = 100_000
@@ -79,26 +98,38 @@ def memory_read_write_test(size_mb=1024, quiet=False):
     for i in range(0, len(arr), step):
         total += arr[i]
     read_time = time.perf_counter() - start
-    print(f"Read time: {read_time:.3f}s" if quiet else Fore.GREEN + f"🟢 Read time: {read_time:.3f}s")
+    print(
+        f"Read completed in {read_time:.3f} seconds"
+        if quiet else Fore.GREEN + f"🟢 Read completed in {read_time:.3f} seconds"
+    )
 
     return write_time, read_time
 
 
 def log_results(write_time, read_time, size_mb, csv_only=False):
+    """
+    Save the results of a benchmark run to text and CSV files.
+    """
     cpu_info = get_cpu_info()
     vmem = psutil.virtual_memory()
 
     if not csv_only:
         with open(RESULTS_FILE, "a") as f:
-            f.write(f"Test size: {size_mb}MB\n")
-            f.write(f"Write time: {write_time:.3f}s\n")
-            f.write(f"Read time: {read_time:.3f}s\n")
-            f.write(f"RAM total: {vmem.total / (1024**3):.2f} GB\n")
-            f.write(f"RAM available: {vmem.available / (1024**3):.2f} GB\n")
+            f.write(f"Test size: {format_size(size_mb)}\n")
+            f.write(f"Write time: {write_time:.3f} seconds\n")
+            f.write(f"Read time: {read_time:.3f} seconds\n")
+            f.write(
+                f"RAM total: {vmem.total / (1024**3):.2f} GB\n"
+            )
+            f.write(
+                f"RAM available: {vmem.available / (1024**3):.2f} GB\n"
+            )
             f.write(f"Timestamp: {time.ctime()}\n")
             f.write(f"CPU: {cpu_info}\n")
             f.write(f"Machine: {platform.machine()}\n")
-            f.write(f"OS: {platform.system()} {platform.release()}\n")
+            f.write(
+                f"OS: {platform.system()} {platform.release()}\n"
+            )
             f.write("-" * 40 + "\n")
 
     write_header = not os.path.exists(CSV_FILE)
@@ -125,7 +156,7 @@ def log_results(write_time, read_time, size_mb, csv_only=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Memory Benchmark Script")
+    parser = argparse.ArgumentParser(description="Memory Benchmark: Test your system's memory speed in a friendly way!")
     parser.add_argument("--sizes", nargs="+", type=int,
                         help="List of test sizes in MB (e.g. --sizes 1024 2048 4096 8192)",
                         default=[1024, 2048, 4096, 8192])
@@ -135,37 +166,53 @@ def main():
                         help="Only output to CSV file, skip text log file")
     parser.add_argument("--quiet", action="store_true",
                         help="Suppress colorful output and emojis (CI/CD friendly)")
+    parser.add_argument("--plot", action="store_true",
+                        help="Generate performance plots from CSV results and exit")
     args = parser.parse_args()
     test_sizes = args.sizes
 
-    # Header
+    if args.plot:
+        plot_results(CSV_FILE)
+        return
+
+    # Friendly header
     print("\nMemory Benchmark Results" if args.quiet
           else Fore.MAGENTA + Style.BRIGHT + "\n📊 Memory Benchmark Results")
-    print("=" * 30)
+    print("=" * 40)
 
     cpu_info = get_cpu_info()
     sysinfo = f"Machine: {platform.machine()} | OS: {platform.system()} {platform.release()}"
-    print(f"System Info: CPU: {cpu_info} | {sysinfo}"
-          if args.quiet else Fore.YELLOW + f"System Info: CPU: {cpu_info} | {sysinfo}")
+    print(
+        f"System Info: CPU: {cpu_info} | {sysinfo}"
+        if args.quiet else Fore.YELLOW + f"System Info: CPU: {cpu_info} | {sysinfo}"
+    )
 
-    runs_info = f" (avg over {args.runs} runs)" if args.runs > 1 else ""
-    headers = f"{'Size':<8}{'Write Time':<15}{'Read Time':<15}{'Total RAM':<12}{'Available':<12}{runs_info}"
+    runs_info = f" (average of {args.runs} runs)" if args.runs > 1 else ""
+    headers = (
+        f"{'Size':<10}{'Write Time':<18}{'Read Time':<18}"
+        f"{'Total RAM':<14}{'Available':<14}{runs_info}"
+    )
     print(headers)
-    print("-" * (62 + len(runs_info)))
+    print("-" * (74 + len(runs_info)))
 
     for size_mb in test_sizes:
         label = format_size(size_mb)
-        print(f"\nTesting {label}..." if args.quiet else Fore.BLUE + f"\n🧪 Testing {label}...")
+        print(
+            f"\nTesting {label}..."
+            if args.quiet else Fore.BLUE + f"\n🧪 Testing {label}..."
+        )
 
         write_times, read_times = [], []
         for run in range(args.runs):
             if args.runs > 1 and not args.quiet:
-                print(f"  Run {run + 1}/{args.runs}")
+                print(f"  Run {run + 1} of {args.runs}")
 
             write_time, read_time = memory_read_write_test(size_mb, args.quiet)
             if write_time is None or read_time is None:
-                msg = f"Skipping {label} due to memory allocation failure"
-                print(msg if args.quiet else Fore.RED + f"⏭️  {msg}")
+                msg = f"Skipping {label} (not enough memory)"
+                print(
+                    msg if args.quiet else Fore.RED + f"⏭️  {msg}"
+                )
                 break
 
             write_times.append(write_time)
@@ -180,8 +227,10 @@ def main():
         total_ram = vmem.total / (1024**3)
         avail_ram = vmem.available / (1024**3)
 
-        result_line = (f"{label:<8}{avg_write_time:<15.3f}{avg_read_time:<15.3f}"
-                       f"{total_ram:<12.2f}{avail_ram:<12.2f}")
+        result_line = (
+            f"{label:<10}{avg_write_time:<18.3f}{avg_read_time:<18.3f}"
+            f"{total_ram:<14.2f}{avail_ram:<14.2f}"
+        )
         if not args.quiet:
             result_line += " 📝"
         print(result_line)
@@ -189,9 +238,36 @@ def main():
         log_results(avg_write_time, avg_read_time, size_mb, args.csv_only)
 
     log_files = [CSV_FILE] if args.csv_only else [RESULTS_FILE, CSV_FILE]
-    print(f"\nResults logged to {' and '.join(log_files)}"
-          if args.quiet else Fore.MAGENTA + Style.BRIGHT +
-          f"\n✅ Results logged to {' and '.join(log_files)}\n")
+    print(
+        f"\nResults saved to {' and '.join(log_files)}"
+        if args.quiet else Fore.MAGENTA + Style.BRIGHT +
+        f"\n✅ Results saved to {' and '.join(log_files)}\n"
+    )
+
+
+def plot_results(csv_file):
+    """Read CSV results and generate read/write performance plots."""
+    df = pd.read_csv(csv_file)
+    sizes = df["Test Size (MB)"]
+    write_times = df["Write Time (s)"]
+    read_times = df["Read Time (s)"]
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(
+        sizes, write_times, marker='o', label='Write Time'
+    )
+    plt.plot(
+        sizes, read_times, marker='o', label='Read Time'
+    )
+    plt.xlabel('Test Size (MB)')
+    plt.ylabel('Time (s)')
+    plt.title('Memory Read/Write Performance')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig('memory_benchmark_performance.png')
+    plt.show()
+    print("Plot saved as memory_benchmark_performance.png")
 
 
 if __name__ == "__main__":

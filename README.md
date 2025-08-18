@@ -1,3 +1,14 @@
+## 📝 Sample Memory Benchmark Results
+
+| System                | Test Size | Write Time (s) | Read Time (s) | RAM Total (GB) | OS         |
+|-----------------------|-----------|----------------|---------------|---------------|------------|
+| Desktop (DDR5, Ryzen) | 1024MB    | 0.050          | 0.007         | 62.41         | Linux      |
+| Desktop (DDR5, Ryzen) | 8192MB    | 0.406          | 0.007         | 62.41         | Linux      |
+| Laptop (DDR4, i9)     | 1024MB    | 0.210          | 0.018         | 31.69         | Windows 11 |
+| Laptop (DDR4, i9)     | 8192MB    | 2.957          | 0.033         | 31.69         | Windows 11 |
+
+> Lower times indicate better performance.
+> Use the `--plot` option to visualize these results.
 # 🧠 Memory Benchmark
 
 A powerful Python script to benchmark your system's memory performance with enterprise-grade features. Perfect for comparing RAM configurations before and after hardware upgrades, CI/CD pipelines, and performance monitoring.
@@ -34,6 +45,7 @@ A powerful Python script to benchmark your system's memory performance with ente
 - **Multiple Test Sizes**: Benchmarks 1GB, 2GB, 4GB, and 8GB by default (customizable)
 - **Robust Error Handling**: Gracefully handles memory allocation failures on low-RAM systems
 - **Multiple Output Formats**: Results logged to both text files and structured CSV
+- **Built-in Graphing**: Instantly visualize memory performance with the `--plot` option
 - **Statistical Stability**: Average results over multiple runs to reduce variance
 - **CI/CD Ready**: Quiet mode for automated environments
 - **Cross-Platform**: Portable CPU detection for Linux, macOS, and Windows
@@ -45,6 +57,8 @@ A powerful Python script to benchmark your system's memory performance with ente
 - NumPy >= 1.26.4
 - psutil
 - colorama
+- matplotlib
+- pandas
 
 <a id="quick-start"></a>
 ## ⚡️ Quick Start
@@ -92,23 +106,28 @@ python memory_benchmark.py --quiet
 # CSV output only (skip text log)
 python memory_benchmark.py --csv-only
 
+# Generate and view performance graph
+python memory_benchmark.py --plot
+
 # Production example: stable, quiet, CSV-only
 python memory_benchmark.py --quiet --csv-only --runs 3 --sizes 2048 4096 8192
 ```
 
 <a id="command-line-options"></a>
 ### Command Line Options
-| Option | Description | Example |
-|--------|-------------|---------|
-| `--sizes` | Test sizes in MB | `--sizes 1024 2048 4096` |
-| `--runs` | Number of runs to average | `--runs 5` |
-| `--csv-only` | Skip text log, CSV output only | `--csv-only` |
-| `--quiet` | No colors/emojis (CI/CD mode) | `--quiet` |
+| Option      | Description                                   | Example                       |
+|-------------|-----------------------------------------------|-------------------------------|
+| `--sizes`   | Test sizes in MB                              | `--sizes 1024 2048 4096`      |
+| `--runs`    | Number of runs to average                     | `--runs 5`                    |
+| `--csv-only`| Skip text log, CSV output only                | `--csv-only`                  |
+| `--quiet`   | No colors/emojis (CI/CD mode)                 | `--quiet`                     |
+| `--plot`    | Generate and display performance graphs from CSV | `--plot`                   |
 
 <a id="output-files"></a>
 ## 📊 Output Files
 - **`memory_benchmark_results.txt`**: Human-readable detailed logs (unless `--csv-only`)
 - **`memory_benchmark_results.csv`**: Structured data for analysis and graphing
+- **`memory_benchmark_performance.png`**: Graphical visualization of your benchmark results (created with `--plot`)
 
 <a id="csv-columns"></a>
 ### CSV Columns
@@ -180,6 +199,8 @@ python memory_benchmark.py --quiet --sizes 1024 2048 --runs 2
   - Small tests (< 1GB): May not reflect real-world usage
   - Large tests (> 4GB): Better representation of sustained memory performance
   - Very large tests (> 8GB): May fail on systems with limited RAM
+
+- **Visual graphs**: Use `--plot` to instantly see trends and compare results. The generated PNG can be included in the repo as a sample output for others to see expected results.
 
 <a id="development"></a>
 ## 🔧 Development
