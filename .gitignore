@@ -212,3 +212,8 @@ __marimo__/
 # Benchmark results
 memory_benchmark_*.txt
 memory_benchmark_*.csv
+
+# Performance chart images
+# Ignore generated PNGs; keep the sample image tracked
+memory_benchmark_performance*.png
+!memory_benchmark_performance_sample.png
