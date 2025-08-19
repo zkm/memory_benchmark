@@ -29,8 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload distribution artifacts (optional)
-        uses: actions/upload-artifact@v3
+        if: success() && (hashFiles('dist/*') != '')
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/*
-        if: success() && (hashFiles('dist/*') != '')
