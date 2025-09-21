@@ -25,6 +25,7 @@ A powerful Python script to benchmark your system's memory performance with ente
    - [Command Line Options](#command-line-options)
 - [Output Files](#output-files)
    - [CSV Columns](#csv-columns)
+   - [Bandwidth CSV](#bandwidth-csv)
 - [Advanced Usage Examples](#advanced-usage-examples)
    - [Performance Monitoring](#performance-monitoring)
    - [Hardware Comparison](#hardware-comparison)
@@ -122,12 +123,17 @@ python memory_benchmark.py --quiet --csv-only --runs 3 --sizes 2048 4096 8192
 | `--csv-only`| Skip text log, CSV output only                | `--csv-only`                  |
 | `--quiet`   | No colors/emojis (CI/CD mode)                 | `--quiet`                     |
 | `--plot`    | Generate and display performance graphs from CSV | `--plot`                   |
+| `--read-mode` | How to measure read timing: `full` touches all bytes (realistic), `sample` reads a subset (fast) | `--read-mode full` |
+| `--compare-a` | Path to baseline CSV (A) for comparison        | `--compare-a baseline.csv` |
+| `--compare-b` | Path to target CSV (B) for comparison          | `--compare-b today.csv`    |
 
 <a id="output-files"></a>
 ## 📊 Output Files
 - **`memory_benchmark_results.txt`**: Human-readable detailed logs (unless `--csv-only`)
 - **`memory_benchmark_results.csv`**: Structured data for analysis and graphing
-- **`memory_benchmark_performance.png`**: Graphical visualization of your benchmark results (created with `--plot`)
+- **`memory_benchmark_performance.png`**: Time vs size visualization of your benchmark results (created with `--plot`)
+- **`memory_benchmark_performance_bandwidth.png`**: Bandwidth (GB/s) vs size visualization derived from the CSV (created with `--plot`)
+- **`memory_benchmark_results_with_bw.csv`**: Extended CSV that includes computed write/read bandwidth columns (GB/s)
 
 <a id="csv-columns"></a>
 ### CSV Columns
@@ -140,6 +146,14 @@ python memory_benchmark.py --quiet --csv-only --runs 3 --sizes 2048 4096 8192
 - CPU
 - Machine
 - OS
+
+<a id="bandwidth-csv"></a>
+### Bandwidth CSV
+The extended CSV `memory_benchmark_results_with_bw.csv` adds:
+- Write Bandwidth (GB/s)
+- Read Bandwidth (GB/s)
+
+Values are computed from Test Size (MB) and Time using binary units (1024 MB = 1 GB).
 
 <a id="advanced-usage-examples"></a>
 ## 🛠 Advanced Usage Examples
@@ -171,7 +185,11 @@ cp memory_benchmark_results.csv baseline_results.csv
 
 # After upgrade - compare results
 python memory_benchmark.py --runs 5 --csv-only
-# Compare the two CSV files using your preferred tool (Excel, pandas, etc.)
+# Option 1: Use built-in comparator to generate a delta CSV
+python memory_benchmark.py --compare-a baseline_results.csv --compare-b memory_benchmark_results.csv
+# This writes memory_benchmark_comparison.csv with time and bandwidth deltas (absolute and %)
+
+# Option 2: Compare with your preferred tool (Excel, pandas, etc.)
 ```
 
 <a id="stress-testing"></a>
@@ -194,6 +212,7 @@ python memory_benchmark.py --quiet --sizes 1024 2048 --runs 2
 <a id="interpreting-results"></a>
 ## 📈 Interpreting Results
 - **Lower times = better performance**: Faster memory read/write speeds
+- **Higher GB/s = better bandwidth**: Console output now includes calculated write/read bandwidth
 - **Multiple runs**: Use `--runs 3` or higher for consistent results
 - **Test size considerations**:
   - Small tests (< 1GB): May not reflect real-world usage
@@ -222,7 +241,7 @@ python -m py_compile memory_benchmark.py
 python -m flake8 memory_benchmark.py --max-line-length=120
 
 # Quick test
-python memory_benchmark.py --sizes 100 --quiet
+python memory_benchmark.py --sizes 100 --quiet --read-mode full
 ```
 
 <a id="system-compatibility"></a>
