@@ -246,7 +246,12 @@ def compare_csvs(csv_a: str, csv_b: str, out_csv: str = "memory_benchmark_compar
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Memory Benchmark: Test your system's memory speed in a friendly way!")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Memory Benchmark: Test your system's memory "
+            "speed in a friendly way!"
+        )
+    )
     parser.add_argument("--sizes", nargs="+", type=int,
                         help="List of test sizes in MB (e.g. --sizes 1024 2048 4096 8192)",
                         default=[1024, 2048, 4096, 8192])
@@ -258,8 +263,15 @@ def main():
                         help="Suppress colorful output and emojis (CI/CD friendly)")
     parser.add_argument("--plot", action="store_true",
                         help="Generate performance plots from CSV results and exit")
-    parser.add_argument("--read-mode", choices=["full", "sample"], default="full",
-                        help="How to measure read timing: 'full' touches all bytes (realistic), 'sample' reads a subset (fast, less accurate)")
+    parser.add_argument(
+        "--read-mode",
+        choices=["full", "sample"],
+        default="full",
+        help=(
+            "How to measure read timing: 'full' touches all bytes (realistic), "
+            "'sample' reads a subset (fast, less accurate)"
+        ),
+    )
     parser.add_argument("--compare-a", type=str, help="Path to baseline CSV to compare (A)")
     parser.add_argument("--compare-b", type=str, help="Path to target CSV to compare (B)")
     args = parser.parse_args()
@@ -269,12 +281,13 @@ def main():
         missing = [p for p in (args.compare_a, args.compare_b) if not os.path.exists(p)]
         if missing:
             print(
-                (f"Error: Could not find the following file(s): {', '.join(missing)}\n"
-                 f"Tips:\n"
-                 f" - Make sure you ran at least one benchmark to create CSVs.\n"
-                 f" - If you meant to compare against your current CSV, use '{CSV_FILE}' or '{BW_CSV_FILE}'.\n"
-                 f" - To create a baseline from your current CSV: cp {CSV_FILE} baseline_results.csv\n"
-                 f"   then run a new benchmark and compare: --compare-a baseline_results.csv --compare-b {CSV_FILE}")
+             (f"Error: Could not find the following file(s): {', '.join(missing)}\n"
+              f"Tips:\n"
+              f" - Make sure you ran at least one benchmark to create CSVs.\n"
+              f" - If you meant to compare against your current CSV, use '{CSV_FILE}' or '{BW_CSV_FILE}'.\n"
+              f" - To create a baseline from your current CSV: cp {CSV_FILE} baseline_results.csv\n"
+              f"   then run a new benchmark and compare: --compare-a baseline_results.csv "
+              f"--compare-b {CSV_FILE}")
             )
             return
         out_csv = compare_csvs(args.compare_a, args.compare_b)
