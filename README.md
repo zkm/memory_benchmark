@@ -11,6 +11,16 @@
 > Use the `--plot` option to visualize these results.
 # 🧠 Memory Benchmark
 
+[![Python CI](https://github.com/zkm/memory_benchmark/actions/workflows/python-ci.yml/badge.svg)](https://github.com/zkm/memory_benchmark/actions/workflows/python-ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/zkm/memory_benchmark)](https://github.com/zkm/memory_benchmark/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![psutil](https://img.shields.io/badge/psutil-5A5A5A)
+![pandas](https://img.shields.io/badge/pandas-150458?logo=pandas&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C)
+![Linux, macOS, Windows](https://img.shields.io/badge/platforms-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows-6E6E6E)
+
 A powerful Python script to benchmark your system's memory performance with enterprise-grade features. Perfect for comparing RAM configurations before and after hardware upgrades, CI/CD pipelines, and performance monitoring.
 
 ---
